@@ -1,3 +1,14 @@
+function holdParameter(parameter, time) {
+  if (typeof parameter.cancelAndHoldAtTime === 'function') {
+    parameter.cancelAndHoldAtTime(time);
+  } else {
+    // Firefox and older browsers may only expose cancelScheduledValues.
+    const value = parameter.value;
+    parameter.cancelScheduledValues(time);
+    parameter.setValueAtTime(value, time);
+  }
+}
+
 // Audio starts only after an explicit Play gesture. One oscillator is held until Stop.
 export class TonePlayer {
   constructor(createContext = () => {
@@ -52,7 +63,7 @@ export class TonePlayer {
     this.voice.oscillator.frequency.setTargetAtTime(frequency, now, 0.008);
     this.voice.oscillator.type = waveform;
     const parameter = this.voice.gain.gain;
-    parameter.cancelAndHoldAtTime(now);
+    holdParameter(parameter, now);
     // Linear ramps reach exactly zero, so zero volume is true silence.
     parameter.linearRampToValueAtTime(volume, now + 0.02);
   }
@@ -61,7 +72,7 @@ export class TonePlayer {
     if (!this.voice) return;
     const { oscillator, gain } = this.voice;
     const now = this.context.currentTime;
-    gain.gain.cancelAndHoldAtTime(now);
+    holdParameter(gain.gain, now);
     gain.gain.linearRampToValueAtTime(0, now + 0.02);
     oscillator.stop(now + 0.03);
     this.voice = null;

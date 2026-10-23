@@ -9,6 +9,7 @@ function parameter() {
     linearRampToValueAtTime(...args) { this.calls.push(['ramp', ...args]); },
     setTargetAtTime(...args) { this.calls.push(['target', ...args]); },
     cancelAndHoldAtTime(...args) { this.calls.push(['hold', ...args]); },
+    cancelScheduledValues(...args) { this.calls.push(['cancel', ...args]); },
   };
 }
 
@@ -100,4 +101,17 @@ test('updates and stop before Play are harmless; disposed contexts can be recrea
   await player.dispose();
   await player.start(440, 1, 'sine');
   assert.notEqual(player.context, previous);
+});
+
+test('volume and Stop work when cancelAndHoldAtTime is unavailable', async () => {
+  const audio = context();
+  const player = new TonePlayer(() => audio);
+  await player.start(440, 0.9, 'sine');
+  const gain = player.voice.gain.gain;
+  gain.cancelAndHoldAtTime = undefined;
+  gain.value = 0.45;
+  player.update(220, 0, 'triangle');
+  assert.deepEqual(gain.calls.slice(-3), [['cancel', 10], ['set', 0.45, 10], ['ramp', 0, 10.02]]);
+  player.stop();
+  assert.equal(player.voice, null);
 });
