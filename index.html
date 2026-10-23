@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101525">
+    <meta name="description" content="Explore continuous pitches from C2 to C5 with live waveforms, semitone snapping, and five color themes.">
+    <title>Continuous Pitch Slider</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./src/app.js"></script>
+  </head>
+  <body data-theme="material-dark">
+    <main class="app">
+      <header>
+        <div class="heading-row">
+          <h1>Continuous Pitch Slider</h1>
+          <div class="theme-control">
+            <label for="theme">Theme</label>
+            <select id="theme">
+              <option value="material-dark">Material dark</option>
+              <option value="solarized-dark">Solarized dark</option>
+              <option value="solarized-light">Solarized light</option>
+              <option value="midnight-neon">Midnight neon</option>
+              <option value="paper-light">Paper light</option>
+            </select>
+          </div>
+        </div>
+        <p class="intro">Select a start and end pitch (C2–C5), then move the slider to sweep continuously between them. Press Play to hold the current tone; adjust volume at any time.</p>
+      </header>
+
+      <div class="cards">
+        <section class="card" aria-labelledby="range-title">
+          <h2 id="range-title">Pitch range</h2>
+          <p>Choose the start and end notes. The slider below will span this range.</p>
+          <div class="note-controls">
+            <div class="field"><label for="start-note">Start note</label><select id="start-note"></select></div>
+            <div class="field"><label for="end-note">End note</label><select id="end-note"></select></div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="volume-title">
+          <h2 id="volume-title">Volume</h2>
+          <p>Master output level from complete silence to a boosted tone.</p>
+          <label for="volume">Level</label>
+          <div class="slider-row">
+            <input id="volume" type="range" min="0" max="2.5" step="0.01" value="0.9" aria-describedby="volume-help">
+            <output id="volume-value" for="volume">0.90×</output>
+          </div>
+          <div class="sound-controls">
+            <div class="field waveform-field">
+              <label for="waveform">Waveform</label>
+              <select id="waveform"><option value="sine">Sine</option><option value="square">Square</option><option value="sawtooth">Sawtooth</option><option value="triangle">Triangle</option></select>
+            </div>
+            <label class="checkbox-label" for="snap"><input id="snap" type="checkbox"> <span>Snap to nearest semitone</span></label>
+          </div>
+          <p class="hint" id="volume-help">0 is silent · 1× is full level · up to 2.5× boost</p>
+        </section>
+
+        <section class="card selected-card" aria-labelledby="selected-title">
+          <h2 id="selected-title">Selected pitch</h2>
+          <p>Move the slider to pick any pitch continuously between your start and end frequencies.</p>
+          <div class="pitch-label-row"><label for="pitch">Range</label><output id="pitch-position" for="pitch">57%</output></div>
+          <input id="pitch" type="range" min="0" max="100" step="0.01" value="57" aria-describedby="pitch-help">
+          <div class="readouts">
+            <div class="frequency-pill"><span class="pill-label">Start</span><output id="start-frequency">130.8 Hz</output><span id="start-name" class="note-name">(C3)</span></div>
+            <div class="frequency-pill"><span class="pill-label">End</span><output id="end-frequency">138.6 Hz</output><span id="end-name" class="note-name">(C#3)</span></div>
+            <div class="frequency-pill selected-pill"><span class="pill-label">Selected</span><output id="selected-frequency" for="pitch start-note end-note snap">135.2 Hz</output><span id="selected-name" class="note-name">(C#3)</span></div>
+          </div>
+          <div class="playback-row">
+            <button id="play" type="button" aria-pressed="false">Play tone</button>
+            <span id="playback-status" class="status" role="status"><span class="status-dot" aria-hidden="true"></span><span id="status-text">Stopped</span></span>
+          </div>
+          <p class="hint" id="pitch-help">Use ← / → for fine adjustments, or Home / End to reach either endpoint.</p>
+          <p id="audio-error" class="error" role="alert" hidden></p>
+        </section>
+      </div>
+      <noscript><p>Please enable JavaScript to use the pitch controls and play audio.</p></noscript>
+    </main>
+  </body>
+</html>
