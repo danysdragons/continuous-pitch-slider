@@ -8,7 +8,8 @@ A small, dependency-free Web Audio instrument. Choose two notes from **C2 to C5*
 - Prominent start, end, and selected frequencies with nearest note names (A4 = 440 Hz).
 - Sine, square, sawtooth, and triangle waveforms; changes apply while playing.
 - Volume from exact silence to **2.5×**, initially **0.90×**, with a compressor to control boosted peaks.
-- Material dark, Solarized dark, Solarized light, Midnight neon, and Paper light themes. The selected theme is remembered locally.
+- Eleven themes, including Analog Workshop, Bauhaus, Blueprint, Pocket Arcade, Paper Ensemble, and Glass Observatory. The selected theme is remembered locally.
+- A C2–C5 piano with C major markers and an indicator on held semitones. Choosing a key outside the slider range extends the nearest endpoint to include that note.
 - Vertically stacked, responsive cards, visible filled sliders, and native keyboard controls.
 
 Audio begins only when you press **Play tone** and continues until you press **Stop tone** or leave the page. The pitch slider supports arrow keys and Home/End. A zero volume setting mutes the signal while keeping the oscillator running.

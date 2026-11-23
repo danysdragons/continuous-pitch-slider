@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#101525">
-    <meta name="description" content="Explore continuous pitches from C2 to C5 with live waveforms, semitone snapping, and five color themes.">
+    <meta name="description" content="Explore pitches from C2 to C5 with a continuous slider, a piano keyboard, live waveforms, and eleven instrument themes.">
     <title>Continuous Pitch Slider</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="./styles.css">
@@ -23,6 +23,12 @@
               <option value="solarized-light">Solarized light</option>
               <option value="midnight-neon">Midnight neon</option>
               <option value="paper-light">Paper light</option>
+              <option value="analog-workshop">Analog Workshop</option>
+              <option value="bauhaus">Bauhaus</option>
+              <option value="blueprint">Blueprint</option>
+              <option value="pocket-arcade">Pocket Arcade</option>
+              <option value="paper-ensemble">Paper Ensemble</option>
+              <option value="glass-observatory">Glass Observatory</option>
             </select>
           </div>
         </div>
@@ -73,6 +79,14 @@
           </div>
           <p class="hint" id="pitch-help">Use ← / → for fine adjustments, or Home / End to reach either endpoint.</p>
           <p id="audio-error" class="error" role="alert" hidden></p>
+        </section>
+
+        <section class="card piano-card" aria-labelledby="piano-title">
+          <h2 id="piano-title">Piano keyboard</h2>
+          <p id="piano-help">Choose a note from C2 to C5. Use ← / → to move between keys and Enter to select. Play tone holds the selected pitch. Markers show the C major scale.</p>
+          <div class="piano-scroll">
+            <div id="piano" class="piano" role="group" aria-labelledby="piano-title" aria-describedby="piano-help"></div>
+          </div>
         </section>
       </div>
       <noscript><p>Please enable JavaScript to use the pitch controls and play audio.</p></noscript>

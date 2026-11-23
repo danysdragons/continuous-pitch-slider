@@ -10,6 +10,7 @@ const waveform = byId('waveform');
 const snap = byId('snap');
 const theme = byId('theme');
 const play = byId('play');
+const piano = byId('piano');
 const player = new TonePlayer();
 let starting = false;
 
@@ -18,6 +19,53 @@ for (const select of [start, end]) {
 }
 start.value = '48';
 end.value = '49';
+
+const pianoKeys = new Map();
+let whiteKeyCount = 0;
+for (const note of NOTES) {
+  const key = document.createElement('button');
+  const isBlack = note.name.includes('#');
+  key.type = 'button';
+  key.className = `piano-key ${isBlack ? 'black-key' : 'white-key'}`;
+  key.style.setProperty('--key-index', whiteKeyCount);
+  key.setAttribute('aria-label', note.name);
+  key.tabIndex = note.midi === 49 ? 0 : -1;
+
+  const label = document.createElement('span');
+  label.className = 'key-label';
+  label.textContent = note.name;
+  key.append(label);
+  if (!isBlack) whiteKeyCount++;
+  key.addEventListener('click', () => {
+    const ascending = Number(start.value) <= Number(end.value);
+    if (note.midi < Math.min(Number(start.value), Number(end.value))) {
+      (ascending ? start : end).value = String(note.midi);
+    } else if (note.midi > Math.max(Number(start.value), Number(end.value))) {
+      (ascending ? end : start).value = String(note.midi);
+    }
+    const span = Number(end.value) - Number(start.value);
+    pitch.value = span ? String((note.midi - Number(start.value)) / span * 100) : '0';
+    render();
+  });
+  pianoKeys.set(note.midi, key);
+  piano.append(key);
+}
+piano.style.setProperty('--white-key-count', whiteKeyCount);
+
+piano.addEventListener('focusin', (event) => {
+  if (!event.target.classList.contains('piano-key')) return;
+  piano.querySelector('[tabindex="0"]').tabIndex = -1;
+  event.target.tabIndex = 0;
+});
+
+piano.addEventListener('keydown', (event) => {
+  const offset = { ArrowLeft: -1, ArrowRight: 1, Home: -Infinity, End: Infinity }[event.key];
+  if (offset === undefined || !event.target.classList.contains('piano-key')) return;
+  event.preventDefault();
+  const index = NOTES.findIndex((note) => pianoKeys.get(note.midi) === event.target);
+  const next = NOTES[Math.max(0, Math.min(NOTES.length - 1, index + offset))];
+  pianoKeys.get(next.midi).focus();
+});
 
 try {
   const stored = localStorage.getItem('pitch-slider-theme');
@@ -29,6 +77,20 @@ function currentPitch() {
   return selectedPitch(Number(start.value), Number(end.value), Number(pitch.value), snap.checked);
 }
 
+function updatePiano(midi) {
+  const nearest = Math.round(midi);
+  // Continuous slider positions can round by up to .002 semitones at this range.
+  const isSemitone = Math.abs(midi - nearest) < .002;
+  const hasFocus = piano.contains(document.activeElement);
+  for (const [note, key] of pianoKeys) {
+    const selected = note === nearest;
+    if (!hasFocus) key.tabIndex = selected ? 0 : -1;
+    if (selected) key.setAttribute('aria-current', 'true');
+    else key.removeAttribute('aria-current');
+    key.classList.toggle('held', selected && isSemitone && Boolean(player.voice));
+  }
+}
+
 function updatePlayback() {
   const active = Boolean(player.voice);
   const running = active && player.context.state === 'running';
@@ -36,6 +98,7 @@ function updatePlayback() {
   play.textContent = active ? 'Stop tone' : 'Play tone';
   byId('playback-status').classList.toggle('playing', running);
   byId('status-text').textContent = active ? (running ? 'Playing' : 'Audio paused') : 'Stopped';
+  updatePiano(currentPitch().midi);
 }
 player.onStateChange = updatePlayback;
 
@@ -54,6 +117,7 @@ function render() {
   volume.style.setProperty('--progress', `${Number(volume.value) / 2.5 * 100}%`);
   pitch.setAttribute('aria-valuetext', `${format(selected.frequency)}, ${selected.name}${snap.checked ? ', snapped to semitone' : ', continuous'}`);
   volume.setAttribute('aria-valuetext', Number(volume.value) === 0 ? 'Silent' : `${Number(volume.value).toFixed(2)} times full level`);
+  updatePiano(selected.midi);
   player.update(selected.frequency, Number(volume.value), waveform.value);
 }
 
